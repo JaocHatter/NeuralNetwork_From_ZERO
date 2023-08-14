@@ -8,29 +8,17 @@ np.random.seed(7) #agregamos una semilla
 df = pd.read_csv('data/mnist_train.csv')
 
 imgs =df.iloc[0:,1:] #separamos las imagenes de los labels
-X=imgs.to_numpy()
-dataset_size=len(X)
-
+X=imgs.to_numpy().T
 y = df.iloc[:,0:1] #capturamos los labels
-y = y.to_numpy()
+y = y.to_numpy().squeeze()
 unique, counts = np.unique(y, return_counts=True)
 
-y_train = np.zeros((len(y), 10))
-for i, y in enumerate(y):
-    y_train[i][y] = 1
-
+y_train = np.zeros((10,len(y)))
+for i, y_it in enumerate(y):
+    y_train[y_it][i] = 1
+#Normalizing data to prevent overflow
 X=X/255
-print(y_train.shape)
-print(y_train[:5])
-"""#Lets generate Data
-def f(x,y):
-    return 23.75*x-13.9*y+43.2
-x_train=np.random.rand(1000,1)
-y_train=np.random.rand(1000,1)
 
-z_train=f(x_train+np.random.rand(1000,1)*0.1,y_train+np.random.rand(1000,1)*0.1)
-
-X_input=np.column_stack((x_train,y_train)).T"""
 #Activation functions
 
 def softmax(x):
@@ -46,8 +34,8 @@ def relu(x):
 def relu_derivative(x):
     return np.where(x > 0, 1, 0)
 
-def cross_Entropy_grad(y_true,y_pred):
-    return np.sum(-y_true/(y_pred+1e-15))
+def cross_entropy_derivative(y_true,y_pred):
+    return y_pred-y_true # -log(y_true/y_pred)    
 
 #Layers
 class Layer_Dense:
@@ -59,39 +47,52 @@ class Layer_Dense:
 
 #Creating model
 #2 hidden layers
-layer1 = Layer_Dense(784, 32) 
-layer2= Layer_Dense(32,16) 
-output_layer=Layer_Dense(16,10)
-#La salida es de 1output_layer.biases=np.zeros((10,1))
-"""
-        *   *
-    *   
-        *   *   *
-    *           
-        *   *
-"""
-#Training
+hidden_layer = Layer_Dense(n_inputs=784,n_neurons=32) 
+output_layer=Layer_Dense(n_inputs=32,n_neurons=10)
+print("training in process...")
+#Training #MODIFY!
 for j in range(EPOCHS):
-    for i in range(dataset_size):
+    total_loss=0
+    for i in range(60000):
         #Forward Propagation
-        z_1=layer1.weights @ X[i].T + layer1.biases
+        z_1=hidden_layer.weights @ X[:,i:i+1] + hidden_layer.biases
         a_1=relu(z_1)
-        z_2=layer2.weights @ a_1 + layer2.biases
-        a_2=relu(z_2)
-        z_3=output_layer.weights @ a_2
-        a_3=softmax(z_3)
+        z_2=output_layer.weights @ a_1
+        a_2=softmax(z_2)
         #Computation of error
-        loss= -np.sum(y_train[i]*np.log(a_3+1e-15))
+        loss = -np.sum(y_train[:, i:i+1] * np.log(a_2 + 1e-10))  # Adding epsilon to avoid log(0)
+        total_loss+=loss
         #Back Propagation
-        delta_output=cross_Entropy_grad(y_train[i],a_3.T) * softmax_derivative(z_3)
-        delta_layer2=(output_layer.weights.T * delta_output) * relu_derivative(z_2)
-        delta_layer1=(layer2.weights.T * delta_layer2) * relu_derivative(z_1)
-        #Updating parameters with Descent gradient algorithm
+        error_term_output = cross_entropy_derivative(y_train[:,i:i+1],a_2) #dL/dA_2 * dA_2/dZ_2
+        error_term_hidden = (output_layer.weights.T @ error_term_output) * relu_derivative(z_1)
+        #Updating parameters 
         #WEIGHTS
-        output_layer.weights -= LEARNING_RATE * (delta_output*a_2.T)
-        layer2.weights -= LEARNING_RATE * (delta_layer2*a_1.T)
-        layer1.weights -= LEARNING_RATE * (delta_layer1*X[i].T)
+        output_layer.weights -= LEARNING_RATE * (error_term_output @ a_1.T) #delta @ dZ_2/dW_
+        hidden_layer.weights -= LEARNING_RATE * (error_term_hidden @ X[:,i:i+1].T)
+        
         #BIAS
-        layer2.biases -= LEARNING_RATE * delta_layer2
-        layer1.biases -= LEARNING_RATE * delta_layer1
-    print(f"epoch: {j} , loss: {loss} , process: "+"*"*(j/EPOCHS)*20)
+        hidden_layer.biases -= LEARNING_RATE * error_term_hidden
+    mean_loss = total_loss/60000
+    print(f"epoch: {j+1} , loss: {mean_loss} , process: "+"*"*(int((j/EPOCHS)*20)))
+print("Neural network trained sucessfully!")
+data_test=pd.read_csv("data/mnist_test.csv")
+x_test=data_test.iloc[:,1:].to_numpy().T/255
+y_test=data_test.iloc[:,:1].to_numpy().T.squeeze()
+print(x_test.shape)
+print(y_test.shape)
+def prediction(input_,y_true,n_cases):
+    hits=0
+    for i in range(n_cases):
+        z1=hidden_layer.weights @ input_[:,i:i+1] + hidden_layer.biases
+        a1=relu(z1)
+        z2=output_layer.weights @ a1
+        a2=softmax(z2).T
+        pred=np.argmax(a2)
+        print(f"Prediction: {pred} vs Real: {y_true[i]}",end=" ")
+        if pred==y_true[i]:
+            hits+=1
+            print("CORRECT")
+        else:
+            print("INCORRECT")
+    return "Precission: "+str(hits/n_cases)
+print(prediction(x_test,y_test,100))
