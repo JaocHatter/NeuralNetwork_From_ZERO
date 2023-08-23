@@ -9,5 +9,73 @@ To elucidate concepts and theories, I've developed a neural network from the gro
 ![mnist_plot](https://github.com/JaocHatter/NeuralNetwork_From_Zero/assets/112034917/613d66b1-db0b-49cb-9e5c-d1be4ff84679)
 
 ## Explanation
-
+1. Import Libraries
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+```
+3. Constants and Seed
+Define a constant LEARNING_RATE with the value 0.01
+Define a constant EPOCHS with the value 20
+Set the random seed for NumPy using np.random.seed(7)
+4. Loading Data
+Read the CSV data from the file 'data/mnist_train.csv' into the DataFrame df
+5. Data Preparation
+Extract images data by selecting all rows of df except the first column, stored in imgs
+Convert imgs to a numpy array and transpose it to get X
+Extract labels by selecting only the first column of df, stored in y
+Squeeze the dimensions of y to remove unnecessary dimensions
+Calculate unique values and their counts in y, stored in unique and counts respectively
+6. One-Hot Encoding Labels
+Create an array y_train of zeros with a shape of (10, length of y)
+Loop over each label y_it and corresponding index i in y:
+Set the corresponding position in y_train to 1 for the label y_it
+7. Data Normalization
+Normalize the X array by dividing it element-wise by 255
+8. Activation Functions
+Define the softmax function to compute the softmax activation
+Define the softmax_derivative function to compute the derivative of softmax
+Define the relu function to compute the ReLU activation
+Define the relu_derivative function to compute the derivative of ReLU
+Define the cross_entropy_derivative function to compute the derivative of cross-entropy loss
+9. Layer Definition
+Define the class Layer_Dense:
+Initialize with n_inputs and n_neurons
+Initialize the weights as random values and biases as zeros
+Define a forward method to compute the output of the layer
+10. Model Initialization
+Create instance of Layer_Dense called hidden_layer with n_inputs=784 and n_neurons=32
+Create instance of Layer_Dense called output_layer with n_inputs=32 and n_neurons=10
+11. Training Loop
+Loop over each epoch j in the range of EPOCHS:
+Initialize total_loss to 0
+Loop over each data point i in the range of 60000:
+Perform forward propagation:
+Compute z_1 using the hidden layer's weights and biases
+Apply ReLU activation to get a_1
+Compute z_2 using the output layer's weights
+Apply softmax activation to get a_2
+Compute the cross-entropy loss
+Update total_loss with the calculated loss
+Compute error terms for backpropagation
+Update weights and biases using gradient descent
+Calculate the mean loss for the epoch
+Print epoch number, mean loss, and a process indicator
+12. Training Completion
+Print a message indicating that the neural network has been trained successfully
+13. Testing Data Preparation
+Read the test data from the file "data/mnist_test.csv" into the DataFrame data_test
+Extract test images and normalize them
+Extract test labels and squeeze dimensions
+14. Prediction Function
+Define a function prediction that takes input_, y_true, and n_cases
+Initialize hits to 0
+Loop over each test case:
+Perform forward propagation on the test data
+Compare predicted label with true label and count hits
+Print the prediction result (correct or incorrect)
+Return the precision as the ratio of hits to the total number of test cases
+15. Predictions and Evaluation
+Call the prediction function with x_test, y_test, and 100 as arguments and print the precision
 
