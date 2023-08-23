@@ -60,11 +60,11 @@ Normalize the X array by dividing it element-wise by 255
 X=X/255
 ```
 ### 7.  Activation Functions <br>
-Define the softmax function to compute the softmax activation
-Define the softmax_derivative function to compute the derivative of softmax
-Define the relu function to compute the ReLU activation
-Define the relu_derivative function to compute the derivative of ReLU
-Define the cross_entropy_derivative function to compute the derivative of cross-entropy loss
+Define the softmax function to compute the softmax activation <br>
+Define the softmax_derivative function to compute the derivative of softmax<br>
+Define the relu function to compute the ReLU activation<br>
+Define the relu_derivative function to compute the derivative of ReLU<br>
+Define the cross_entropy_derivative function to compute the derivative of cross-entropy loss<br>
 ```python
 def softmax(x):
     e_x = np.exp(x - np.max(x))
@@ -79,10 +79,10 @@ def cross_entropy_derivative(y_true,y_pred):
     return y_pred-y_true # -log(y_true/y_pred)    
 ```
 ### 8. Layer Definition <br>
-Define the class Layer_Dense:
-Initialize with n_inputs and n_neurons
-Initialize the weights as random values and biases as zeros
-Define a forward method to compute the output of the layer
+Define the class Layer_Dense:<br>
+  Initialize with n_inputs and n_neurons<br>
+  Initialize the weights as random values and biases as zeros<br>
+  Define a forward method to compute the output of the layer<br>
 ```python
 class Layer_Dense:
     def __init__(self, n_inputs, n_neurons):
@@ -92,49 +92,90 @@ class Layer_Dense:
         self.output = np.dot(self.weights,inputs) + self.biases
 ```
 ### 9. Model Initialization <br>
-Create instance of Layer_Dense called hidden_layer with n_inputs=784 and n_neurons=32
-Create instance of Layer_Dense called output_layer with n_inputs=32 and n_neurons=10
+Create instance of Layer_Dense called hidden_layer with n_inputs=784 and n_neurons=32<br>
+Create instance of Layer_Dense called output_layer with n_inputs=32 and n_neurons=10<br>
 ```python
 hidden_layer = Layer_Dense(n_inputs=784,n_neurons=32) 
 output_layer=Layer_Dense(n_inputs=32,n_neurons=10)
 ```
 ### 10. Training Loop <br>
-Loop over each epoch j in the range of EPOCHS:
-Initialize total_loss to 0
-Loop over each data point i in the range of 60000:
-Perform forward propagation:
-Compute z_1 using the hidden layer's weights and biases
-Apply ReLU activation to get a_1
-Compute z_2 using the output layer's weights
-Apply softmax activation to get a_2
-Compute the cross-entropy loss
-Update total_loss with the calculated loss
-Compute error terms for backpropagation
-Update weights and biases using gradient descent
-Calculate the mean loss for the epoch
-Print epoch number, mean loss, and a process indicator
+Loop over each epoch j in the range of EPOCHS:<br>
+  Initialize total_loss to 0<br>
+  Loop over each data point i in the range of 60000:<br>
+    Perform forward propagation:<br>
+    Compute z_1 using the hidden layer's weights and biases<br>
+    Apply ReLU activation to get a_1<br>
+    Compute z_2 using the output layer's weights<br>
+    Apply softmax activation to get a_2<br>
+    Compute the cross-entropy loss<br>
+    Update total_loss with the calculated loss<br>
+    Compute error terms for backpropagation<br>
+    Update weights and biases using gradient descent<br>
+  Calculate the mean loss for the epoch<br>
+Print epoch number, mean loss, and a process indicator<br>
 ```python
-
+for j in range(EPOCHS):
+    total_loss=0
+    for i in range(60000):
+        #Forward Propagation
+        z_1=hidden_layer.weights @ X[:,i:i+1] + hidden_layer.biases
+        a_1=relu(z_1)
+        z_2=output_layer.weights @ a_1
+        a_2=softmax(z_2)
+        #Computation of error
+        loss = -np.sum(y_train[:, i:i+1] * np.log(a_2 + 1e-10))  # Adding epsilon to avoid log(0)
+        total_loss+=loss
+        #Back Propagation
+        error_term_output = cross_entropy_derivative(y_train[:,i:i+1],a_2) #dL/dA_2 * dA_2/dZ_2
+        error_term_hidden = (output_layer.weights.T @ error_term_output) * relu_derivative(z_1)
+        #Updating parameters 
+        #WEIGHTS
+        output_layer.weights -= LEARNING_RATE * (error_term_output @ a_1.T) #delta @ dZ_2/dW_
+        hidden_layer.weights -= LEARNING_RATE * (error_term_hidden @ X[:,i:i+1].T)
+        
+        #BIAS
+        hidden_layer.biases -= LEARNING_RATE * error_term_hidden
+    mean_loss = total_loss/60000
+    print(f"epoch: {j+1} , loss: {mean_loss} , process: "+"*"*(int((j/EPOCHS)*20)))  
 ```
 ### 11. Training Completion <br>
-Print a message indicating that the neural network has been trained successfully
-```python
-
-```
+Print a message indicating that the neural network has been trained successfully<br>
 ### 12. Testing Data Preparation
-Read the test data from the file "data/mnist_test.csv" into the DataFrame data_test
-Extract test images and normalize them
-Extract test labels and squeeze dimensions
+Read the test data from the file "data/mnist_test.csv" into the DataFrame data_test<br>
+Extract test images and normalize them<br>
+Extract test labels and squeeze dimensions<br>
 ```python
-
+data_test=pd.read_csv("data/mnist_test.csv")
+x_test=data_test.iloc[:,1:].to_numpy().T/255
+y_test=data_test.iloc[:,:1].to_numpy().T.squeeze()
 ```
 ### 13. Prediction Function <br>
-Define a function prediction that takes input_, y_true, and n_cases
-Initialize hits to 0
-Loop over each test case:
-Perform forward propagation on the test data
-Compare predicted label with true label and count hits
-Print the prediction result (correct or incorrect)
-Return the precision as the ratio of hits to the total number of test cases
-### 14. Predictions and Evaluation
-Call the prediction function with x_test, y_test, and 100 as arguments and print the precision
+Define a function prediction that takes input_, y_true, and n_cases<br>
+Initialize hits to 0<br>
+Loop over each test case:<br>
+  Perform forward propagation on the test data<br>
+  Compare predicted label with true label and count hits<br>
+  Print the prediction result (correct or incorrect)<br>
+Return the precision as the ratio of hits to the total number of test cases<br>
+```python
+def prediction(input_,y_true,n_cases):
+    hits=0
+    for i in range(n_cases):
+        z1=hidden_layer.weights @ input_[:,i:i+1] + hidden_layer.biases
+        a1=relu(z1)
+        z2=output_layer.weights @ a1
+        a2=softmax(z2).T
+        pred=np.argmax(a2)
+        print(f"Prediction: {pred} vs Real: {y_true[i]}",end=" ")
+        if pred==y_true[i]:
+            hits+=1
+            print("CORRECT")
+        else:
+            print("INCORRECT")
+    return "Precission: "+str(hits/n_cases)
+```
+### 14. Predictions and Evaluation<br>
+Call the prediction function with x_test, y_test, and 100 as arguments and print the precision<br>
+```python
+print(prediction(x_test,y_test,100))
+```
