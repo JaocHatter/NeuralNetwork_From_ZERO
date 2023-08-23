@@ -48,7 +48,7 @@ unique, counts = np.unique(y, return_counts=True)
 ### 5. One-Hot Encoding Labels <br>
 Create an array y_train of zeros with a shape of (10, length of y)<br>
 Loop over each label y_it and corresponding index i in y:<br>
-  Set the corresponding position in y_train to 1 for the label y_it<br>
+&emsp;Set the corresponding position in y_train to 1 for the label y_it<br>
 ```python
 y_train = np.zeros((10,len(y)))
 for i, y_it in enumerate(y):
@@ -80,9 +80,9 @@ def cross_entropy_derivative(y_true,y_pred):
 ```
 ### 8. Layer Definition <br>
 Define the class Layer_Dense:<br>
-  Initialize with n_inputs and n_neurons<br>
-  Initialize the weights as random values and biases as zeros<br>
-  Define a forward method to compute the output of the layer<br>
+&emsp;Initialize with n_inputs and n_neurons<br>
+&emsp;Initialize the weights as random values and biases as zeros<br>
+&emsp;Define a forward method to compute the output of the layer<br>
 ```python
 class Layer_Dense:
     def __init__(self, n_inputs, n_neurons):
@@ -100,18 +100,18 @@ output_layer=Layer_Dense(n_inputs=32,n_neurons=10)
 ```
 ### 10. Training Loop <br>
 Loop over each epoch j in the range of EPOCHS:<br>
-  Initialize total_loss to 0<br>
-  Loop over each data point i in the range of 60000:<br>
-    Perform forward propagation:<br>
-    Compute z_1 using the hidden layer's weights and biases<br>
-    Apply ReLU activation to get a_1<br>
-    Compute z_2 using the output layer's weights<br>
-    Apply softmax activation to get a_2<br>
-    Compute the cross-entropy loss<br>
-    Update total_loss with the calculated loss<br>
-    Compute error terms for backpropagation<br>
-    Update weights and biases using gradient descent<br>
-  Calculate the mean loss for the epoch<br>
+&emsp;Initialize total_loss to 0<br>
+&emsp;Loop over each data point i in the range of 60000:<br>
+&emsp;&emsp;Perform forward propagation:<br>
+&emsp;&emsp;Compute z_1 using the hidden layer's weights and biases<br>
+&emsp;&emsp;Apply ReLU activation to get a_1<br>
+&emsp;&emsp;Compute z_2 using the output layer's weights<br>
+&emsp;&emsp;Apply softmax activation to get a_2<br>
+&emsp;&emsp;Compute the cross-entropy loss<br>
+&emsp;&emsp;Update total_loss with the calculated loss<br>
+&emsp;&emsp;Compute error terms for backpropagation<br>
+&emsp;&emsp;Update weights and biases using gradient descent<br>
+&emsp;Calculate the mean loss for the epoch<br>
 Print epoch number, mean loss, and a process indicator<br>
 ```python
 for j in range(EPOCHS):
@@ -153,9 +153,9 @@ y_test=data_test.iloc[:,:1].to_numpy().T.squeeze()
 Define a function prediction that takes input_, y_true, and n_cases<br>
 Initialize hits to 0<br>
 Loop over each test case:<br>
-  Perform forward propagation on the test data<br>
-  Compare predicted label with true label and count hits<br>
-  Print the prediction result (correct or incorrect)<br>
+&emsp;Perform forward propagation on the test data<br>
+&emsp;Compare predicted label with true label and count hits<br>
+&emsp;Print the prediction result (correct or incorrect)<br>
 Return the precision as the ratio of hits to the total number of test cases<br>
 ```python
 def prediction(input_,y_true,n_cases):
