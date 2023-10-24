@@ -2,12 +2,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-EPOCH = 500
+EPOCH = 20
 LEARNING_RATE = 0.000001 #THIS NUMBER COULD BE YOUR WORST NIGHTMARE
+np.random.seed(7) #agregamos una semilla
 
 class Layer_Dense:
     def __init__(self, n_inputs, n_neurons):
-        self.weights = np.random.randn(n_inputs, n_neurons)
+        self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(2. / n_inputs) #Kaiming Initialization or He Initialization!
         self.biases = np.zeros((1, n_neurons))
     
     def forward(self, inputs):
@@ -42,7 +43,7 @@ def relu(x):
     return np.maximum(0, x)
 
 def relu_derivative(x):
-    return np.where(x > 0, 1 , 0)  
+    return np.where(x > 0, 1 , 0).astype(float)
 
 def cross_entropy_derivative(y_true,y_pred):
     return y_pred-y_true # -log(y_true/y_pred)    
@@ -115,7 +116,6 @@ def prediction(input_,y_true,n_cases):
         a1 = relu(z1)
         z2 = output_layer.forward(a1) 
         a2 = softmax(z2)
-        print(a2)
         pred = np.argmax(a2)
         print(f"Prediction: {pred} vs Real: {y_true[i]}",end=" ")
         if pred==y_true[i]:
