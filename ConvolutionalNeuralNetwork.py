@@ -1,15 +1,13 @@
 import numpy as np
 import pandas as pd
-from Layer_Dense import Layer_Dense
 import matplotlib.pyplot as plt
 
-EPOCH = 20
-LEARNING_RATE = .01
+EPOCH = 500
+LEARNING_RATE = 0.000001 #THIS NUMBER COULD BE YOUR WORST NIGHTMARE
 
 class Layer_Dense:
     def __init__(self, n_inputs, n_neurons):
-        # Using np.random.randn for initialization and scaling the values
-        self.weights = np.random.randn(n_inputs, n_neurons) 
+        self.weights = np.random.randn(n_inputs, n_neurons)
         self.biases = np.zeros((1, n_neurons))
     
     def forward(self, inputs):
@@ -35,15 +33,16 @@ for i in range(data_length):
 #Define our activation function, loss function , derivatives, etc...
 
 def softmax_train(x):
-    x -= np.max(x , axis=1 , keepdims = True)
-    exp_x = np.exp(x) #cada elemento de la matriz es exponente de e
-    return exp_x / np.sum(exp_x, axis = 1, keepdims=True)
+    temp = x - np.max(x , axis=1 , keepdims = True)
+    exp_x = np.exp(temp) #cada elemento de la matriz es exponente de e
+    suma =  np.sum(exp_x, axis = 1, keepdims=True)
+    return exp_x / suma
 
 def relu(x):
     return np.maximum(0, x)
 
 def relu_derivative(x):
-    return np.where(x > 0, 1, 0)
+    return np.where(x > 0, 1 , 0)  
 
 def cross_entropy_derivative(y_true,y_pred):
     return y_pred-y_true # -log(y_true/y_pred)    
@@ -55,42 +54,47 @@ def softmax(x):
 #Create the model
 
 hidden_layer = Layer_Dense(
-    image_length,
+    784,
     32
 )
 output_layer = Layer_Dense(
-    32,
+    32, 
     10
 )
-print(output_layer.weights)
-print(hidden_layer.weights)
-print(hidden_layer.biases)
 
-#training function
+#training function using classic gradient descend method
 print("START OF TRAINING")        
+losses = []
 for it in range(EPOCH):
     #forward prop
-    z1 = hidden_layer.forward(X) + hidden_layer.biases#(60000,32)
+    z1 = hidden_layer.forward(X) #(60000,32)
     a1 = relu(z1) 
     z2 = output_layer.forward(a1) #(60000,10)
     a2 = softmax_train(z2)
+    #computing the loss
+    loss = -np.sum(y_train_labels * np.log(a2+1e-10)) / data_length
+    losses.append(loss)
     #backward prop
+    #Output layer
     err1 = cross_entropy_derivative(y_train_labels , a2) #dE/da2 * da2/dz2
-    err2 = (err1 @ output_layer.weights.T) * relu_derivative(z1) #dz2/da1 * da1/dz1
-    #classic gradient descend method
-    #weights
     output_layer.weights -= LEARNING_RATE * (a1.T @ err1)
+    output_layer.biases -= LEARNING_RATE * np.sum(err1, axis=0 , keepdims=True)
+    #Hidden layer
+    err2 = (err1 @ output_layer.weights.T) * relu_derivative(z1) #dz2/da1 * da1/dz1
     hidden_layer.weights -= LEARNING_RATE * (X.T @ err2)
-    #bias
-    hidden_layer.biases -= LEARNING_RATE * np.sum(err2, axis = 0 , keepdims=True)/data_length
-    print("PROGRESS: "+"*"*it)       
+    hidden_layer.biases -= LEARNING_RATE * np.sum(err2, axis = 0 , keepdims=True)
+    print(f"epoch: {it+1} , loss: {loss} , process: "+"*"*(int((it/EPOCH)*20)))
 print("TRAINING COMPLETE")
 
-#Now Lets Test our 
+#History 
 
-print(output_layer.weights)
-print(hidden_layer.weights)
-print(hidden_layer.biases)
+plt.plot(losses)
+plt.title('Training Loss over Epochs')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.show()
+
+#Now Lets Test our model
 
 data_test=pd.read_csv("data/mnist_test.csv")
 x_test=data_test.iloc[:,1:].to_numpy()/255
@@ -107,9 +111,9 @@ def plot_misclassified(input_, pred, real):
 def prediction(input_,y_true,n_cases):
     hits=0
     for i in range(n_cases):
-        z1 = hidden_layer.forward(input_[i]) + hidden_layer.biases
+        z1 = hidden_layer.forward(input_[i]) 
         a1 = relu(z1)
-        z2 = output_layer.forward(a1)
+        z2 = output_layer.forward(a1) 
         a2 = softmax(z2)
         print(a2)
         pred = np.argmax(a2)
