@@ -1,4 +1,4 @@
-# Neural Networks from Zero
+# Neural Networks for Newbies
 
 Welcome to my first AI project! If you're here to explore how neural networks work, you're in the right place. In this walkthrough, you'll gain a deeper understanding of fundamental algorithms and theories in the Machine Learning using an simple example as follow...
 
