@@ -9,6 +9,7 @@ To elucidate concepts and theories, I've developed a neural network from the gro
 ![mnist_plot](https://github.com/JaocHatter/NeuralNetwork_From_Zero/assets/112034917/613d66b1-db0b-49cb-9e5c-d1be4ff84679)
 
 ## Explanation
+In this explanation i will use the first code i made in this repository, a training that uses Stochastic Gradient Descent
 ### 1. Import Libraries
 ```python
 import numpy as np
