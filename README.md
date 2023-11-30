@@ -103,9 +103,9 @@ Loop over each epoch j in the range of EPOCHS:<br>
 &emsp;Initialize total_loss to 0<br>
 &emsp;Loop over each data point i in the range of 60000:<br>
 &emsp;&emsp;Perform forward propagation:<br>
-&emsp;&emsp;Compute z_1 using the hidden layer's weights and biases<br>
+&emsp;&emsp;Compute z_1 (first layer output) using the hidden layer's weights and biases<br>
 &emsp;&emsp;Apply ReLU activation to get a_1<br>
-&emsp;&emsp;Compute z_2 using the output layer's weights<br>
+&emsp;&emsp;Compute z_2 (second layer output) using the output layer's weights<br>
 &emsp;&emsp;Apply softmax activation to get a_2<br>
 &emsp;&emsp;Compute the cross-entropy loss<br>
 &emsp;&emsp;Update total_loss with the calculated loss<br>
