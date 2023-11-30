@@ -7,7 +7,8 @@ Welcome to my first AI project! If you're here to explore how neural networks wo
 To elucidate concepts and theories, I've developed a neural network from the ground up. In other words, it's an artificial neural network functioning without relying on libraries such as TensorFlow or Keras. Instead, I've employed libraries like NumPy, Pandas, and Matplotlib to construct this network. This hands-on approach will give you insight into the core principles behind neural networks.
 
 ![mnist_plot](https://github.com/JaocHatter/NeuralNetwork_From_Zero/assets/112034917/613d66b1-db0b-49cb-9e5c-d1be4ff84679)
-
+## Dataset
+You can download it in [Link Text](https://www.kaggle.com/datasets/oddrationale/mnist-in-csv) 
 ## Explanation
 In this explanation i will use the first code i made in this repository, a training that uses Stochastic Gradient Descent
 ### 1. Import Libraries
