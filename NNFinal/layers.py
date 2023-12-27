@@ -1,6 +1,6 @@
 import numpy as np
-from activation_functions import softmax,relu,relu_derivative,cross_entropy_derivative,softmax_derivative
-activation = {"relu": relu , "softmax" : softmax}
+from activation_functions import softmax,relu,relu_derivative,cross_entropy_derivative,softmax_derivative,softmax_sgd
+activation = {"relu": relu , "softmax" : softmax,"softmax_sgd":softmax_sgd}
 derivative = {"relu": relu_derivative, "softmax": softmax_derivative, "categorical_crossentropy":cross_entropy_derivative}
 class Dense:
     """
@@ -35,7 +35,8 @@ class Dense:
         Parámetros:
             inputs (ndarray): Entradas de la capa.
         """
-        self.output = activation[self.activation](inputs @ self.weights + self.biases)
+        z = inputs @ self.weights + self.biases
+        self.output = activation[self.activation](z)
         return self.output
     def backward(self):
         return

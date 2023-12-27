@@ -3,20 +3,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from models import Sequential
 from layers import Dense
-EPOCH = 1200
-LEARNING_RATE = 0.000001 #THIS NUMBER COULD 
+EPOCH = 800
+LEARNING_RATE = 0.000001 
 np.random.seed(7) #agregamos una semilla
 
 #Prepare our data
 
 data_set=pd.read_csv("data/mnist_train.csv")
-X = data_set.iloc[0:,1:].to_numpy()/255 #Normalize
+X = data_set.iloc[0:,1:].to_numpy() #Normalize
 y_labels = data_set.iloc[:,0:1].to_numpy().squeeze()
 data_length = len(y_labels)
 
+X = X/255
 image_length = len(X[1])
 
-#Apply One Hot Encodding
+#Apply One Hot Encodding    
 
 y_train_labels = np.zeros((data_length,10))
 
@@ -56,4 +57,3 @@ def plot_misclassified(input_, pred, real):
     plt.title(f"Pred: {pred}, Real: {real}")
     plt.imshow(img, cmap="gray")
     plt.show()
-    

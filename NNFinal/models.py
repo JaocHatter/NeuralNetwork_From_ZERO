@@ -56,11 +56,29 @@ class Sequential:
             print("TRAINING COMPLETE")
         #manhana sin falta carnal
         elif self.optimizer == 'SGD':
+            total_loss = 0
+            self.layers[-1].activation = "softmax_sgd"
             for epoch in range(self.epochs):
                 total_loss = 0
-                for i in range():
-                    return  
-        return
+                for i in range(data_lenght):
+                    self.outputs = [features[i:i+1,:]]
+                    for idx in range(0,self.n_layers):
+                        self.outputs.append(self.layers[idx].forward((self.outputs)[idx]))
+                    loss = -np.sum(labels[i:i+1,:] * np.log(self.outputs[-1]+1e-10)) 
+                    total_loss += loss
+                    #backward prop
+                    error = derivative[self.loss_function](labels[i:i+1,:],self.outputs[-1]) # dE/dA(l)*dA(l)/dZ(l)
+                    for idx in range(self.n_layers-1,-1,-1):
+                        self.layers[idx].weights -= self.learning_rate * (self.outputs[idx].T @ error) # W(l) = W(l) - lr * e @ dZ(l)/dW(l)
+                        self.layers[idx].biases -= self.learning_rate *  np.sum(error, axis = 0 , keepdims=True)
+                        if idx != 0:
+                            error = ( error @ self.layers[idx].weights.T) * derivative[self.layers[idx-1].activation]( self.outputs[idx] )
+                mean_loss = total_loss / 60000
+                self.losses.append(mean_loss)
+                print(
+                    f"epoch: {epoch+1} , loss: {mean_loss} , process: " + "*" * (int((epoch / self.epochs) * 20))
+                )
+
     def predict(self,x_test,y_test):
         #fordward prop nms
         for idx in range(1,self.n_layers):
