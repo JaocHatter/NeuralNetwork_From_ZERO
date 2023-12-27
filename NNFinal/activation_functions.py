@@ -15,6 +15,11 @@ def softmax(x):
     suma =  np.sum(exp_x, axis = 1, keepdims=True)
     return exp_x / suma
 
+def softmax_sgd(x):
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum()
+
+
 def mse(y_true,y_pred):
     length_data = y_true.shape[1]
     return (1/length_data) * np.square(y_true-y_pred)
